@@ -1,0 +1,11 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# Ignore private keys
+*.pem
+
+# Environment variables
+.env
+*.tfvars

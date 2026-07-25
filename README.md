@@ -126,30 +126,32 @@ The pipeline:
 
 
 devops-final-project
-|
+│
 ├── portfolio
 │ ├── Dockerfile
 │ ├── index.html
 │ └── style.css
-|
+│
 ├── java-app
 │ ├── Dockerfile
 │ ├── pom.xml
 │ ├── src
 │ └── target
-|
+│
 ├── terraform
 │ ├── main.tf
 │ ├── provider.tf
 │ ├── variables.tf
 │ └── outputs.tf
-|
+│
 ├── .github
 │ └── workflows
 │ └── deploy.yml
-|
+│
 ├── docker-compose.yml
+│
 ├── Jenkinsfile
+│
 └── README.md
 
 

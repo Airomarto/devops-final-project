@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        COMPOSE_CMD = "docker compose"
-    }
-
     stages {
 
         stage('Checkout Source') {
@@ -13,55 +9,61 @@ pipeline {
             }
         }
 
-        stage('Show Docker Version') {
+        stage('Show Versions') {
             steps {
+                sh 'git --version'
                 sh 'docker --version'
                 sh 'docker compose version'
             }
         }
 
+        stage('Build Java Application') {
+            steps {
+                dir('java-app') {
+                    sh 'chmod +x mvnw'
+                    sh './mvnw clean package -DskipTests'
+                }
+            }
+        }
+
         stage('Build Docker Images') {
             steps {
-                sh '${COMPOSE_CMD} build'
+                sh 'docker compose build'
             }
         }
 
         stage('Stop Existing Containers') {
             steps {
-                sh '${COMPOSE_CMD} down || true'
+                sh 'docker compose down || true'
             }
         }
 
-        stage('Deploy Application') {
+        stage('Deploy Containers') {
             steps {
-                sh '${COMPOSE_CMD} up -d'
+                sh 'docker compose up -d'
             }
         }
 
         stage('Verify Deployment') {
             steps {
                 sh 'docker ps'
-            }
-        }
-
-        stage('Cleanup') {
-            steps {
-                sh 'docker image prune -f'
+                sh 'curl -I http://localhost || true'
+                sh 'curl -I http://localhost:8080 || true'
             }
         }
     }
 
     post {
+        always {
+            echo 'Pipeline finished.'
+        }
+
         success {
-            echo 'Deployment completed successfully!'
+            echo 'Deployment Successful!'
         }
 
         failure {
-            echo 'Deployment failed!'
-        }
-
-        always {
-            echo 'Pipeline finished.'
+            echo 'Deployment Failed!'
         }
     }
 }

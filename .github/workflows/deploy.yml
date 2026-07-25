@@ -17,7 +17,7 @@ jobs:
         run: docker build -t portfolio ./portfolio
 
       - name: Build Java App Docker Image
-        run: docker build -t java-app ./samplejavaapp/java-app
+        run: docker build -t java-app ./java-app
 
       - name: Deployment Complete
         run: echo "Docker images built successfully"

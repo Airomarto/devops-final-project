@@ -1,0 +1,29 @@
+name: DevOps CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Java Application
+        working-directory: java-app
+        run: |
+          chmod +x mvnw
+          ./mvnw clean package -DskipTests
+
+      - name: Build Portfolio Docker Image
+        run: docker build -t portfolio ./portfolio
+
+      - name: Build Java App Docker Image
+        run: docker build -t java-app ./java-app
+
+      - name: Deployment Complete
+        run: echo "Docker images built successfully"

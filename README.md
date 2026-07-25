@@ -1,52 +1,72 @@
-# DevOps Final Project - Modern End-to-End Deployment
+# DevOps Final Project - End-to-End Cloud Deployment Pipeline
 
 ## Project Overview
 
-This project demonstrates an end-to-end DevOps implementation for deploying and managing two applications using modern cloud and automation tools.
+This project demonstrates a complete end-to-end DevOps implementation for deploying and managing applications using modern cloud, automation, containerization, and CI/CD practices.
 
-The project includes:
+The project consists of two applications:
 
-1. A Portfolio Web Application built with HTML and CSS.
-2. A Java Spring Boot Application.
+1. **Portfolio Web Application**
+   - A simple HTML/CSS portfolio website
+   - Containerized using Docker
+   - Served through an Nginx container
 
-Both applications are containerized using Docker and deployed on AWS EC2. Infrastructure provisioning is automated using Terraform, server configuration is managed using Ansible, and Continuous Integration is implemented using GitHub Actions.
+2. **Java Spring Boot Application**
+   - A backend application built with Java and Spring Boot
+   - Packaged using Maven
+   - Containerized using Docker
+
+
+The applications are deployed on **AWS EC2** using automated infrastructure provisioning, configuration management, and CI automation.
+
+---
+
+# Project Objectives
+
+The main objectives of this project are:
+
+- Provision cloud infrastructure using Infrastructure as Code
+- Automate server configuration
+- Containerize applications
+- Deploy multiple services together
+- Implement CI automation using GitHub Actions
+- Demonstrate a complete DevOps workflow
 
 ---
 
 # Architecture Overview
 
-
+```
 Developer
-|
-|
-v
+    |
+    |
+    v
 GitHub Repository
-|
-|
-v
+    |
+    |
+    v
 GitHub Actions CI Pipeline
-|
-|
-+----------------+
-| |
-v v
-Docker Build Maven Build
-|
-|
-v
-AWS EC2 Instance
-|
-|
-v
-Docker Compose
-|
-|
-+----------------------+
-| |
-v v
-Portfolio Website Spring Boot Application
-(Nginx Container) (Java Container)
-
+    |
+    |
+    +----------------------+
+    |                      |
+    v                      v
+ Maven Build          Docker Build
+    |                      |
+    +----------+-----------+
+               |
+               v
+          AWS EC2 Instance
+               |
+               v
+        Docker Compose
+               |
+       +-------+-------+
+       |               |
+       v               v
+ Portfolio App     Java Spring Boot App
+ (Nginx)           (Java Container)
+```
 
 ---
 
@@ -54,114 +74,151 @@ Portfolio Website Spring Boot Application
 
 ## Cloud Platform
 
-- AWS EC2
-  - Hosts the deployed applications
-  - Provides the production environment
+### AWS EC2
+
+Used as the production hosting environment for running the containerized applications.
+
+---
 
 ## Infrastructure as Code
 
-- Terraform
+### Terraform
 
-Used to provision AWS infrastructure consistently and repeatably.
+Terraform is used to provision AWS infrastructure consistently and repeatably.
 
-Terraform manages:
+Responsibilities:
 
 - AWS provider configuration
-- Network resources
-- EC2 infrastructure
+- Infrastructure creation
+- Resource management
+
+Terraform files:
+
+```
+terraform/
+├── main.tf
+├── provider.tf
+├── variables.tf
+└── outputs.tf
+```
+
+---
 
 ## Configuration Management
 
-- Ansible
+### Ansible
 
-Used to automate server configuration and application environment preparation.
+Ansible is used to automate server configuration and prepare the EC2 environment.
+
+Responsibilities:
+
+- Installing required packages
+- Configuring Docker environment
+- Managing server setup
+
+Ansible files:
+
+```
+ansible/
+├── inventory
+└── playbook.yml
+```
+
+---
 
 ## Containerization
 
-- Docker
+### Docker
 
-Used to package applications and their dependencies into portable containers.
+Docker is used to package applications and dependencies into portable containers.
 
-Applications containerized:
+Containers:
 
-- Portfolio website container
-- Java Spring Boot application container
+- Portfolio Web Container
+- Java Spring Boot Container
+
+---
 
 ## Container Orchestration
 
-- Docker Compose
+### Docker Compose
 
-Used to manage multiple application containers together.
+Docker Compose manages multiple containers running together.
 
 Services:
 
 - Portfolio service
 - Java application service
 
-## Programming Technologies
+---
 
-- HTML
-- CSS
-- Java
-- Spring Boot
-- Maven
+## CI/CD Automation
 
-## CI/CD
+### GitHub Actions
 
-- GitHub Actions
+GitHub Actions provides Continuous Integration automation.
 
-Used for Continuous Integration automation.
+The pipeline automatically runs when changes are pushed to the main branch.
 
-The pipeline:
+Pipeline steps:
 
-1. Triggers automatically on every push to the main branch.
-2. Checks out the repository.
-3. Builds the Java Spring Boot application.
-4. Builds Docker images for both applications.
-5. Confirms successful image creation.
+1. Checkout repository
+2. Build Java Spring Boot application
+3. Build Docker images
+4. Validate successful builds
+
+Workflow location:
+
+```
+.github/workflows/deploy.yml
+```
 
 ---
 
-# Project Structure
+# Repository Structure
 
-
+```
 devops-final-project
 │
+├── ansible
+│   ├── inventory
+│   └── playbook.yml
+│
 ├── portfolio
-│ ├── Dockerfile
-│ ├── index.html
-│ └── style.css
+│   ├── Dockerfile
+│   ├── index.html
+│   └── style.css
 │
 ├── java-app
-│ ├── Dockerfile
-│ ├── pom.xml
-│ ├── src
-│ └── target
+│   ├── Dockerfile
+│   ├── pom.xml
+│   ├── src
+│   └── target
 │
 ├── terraform
-│ ├── main.tf
-│ ├── provider.tf
-│ ├── variables.tf
-│ └── outputs.tf
+│   ├── main.tf
+│   ├── provider.tf
+│   ├── variables.tf
+│   └── outputs.tf
 │
 ├── .github
-│ └── workflows
-│ └── deploy.yml
+│   └── workflows
+│       └── deploy.yml
 │
 ├── docker-compose.yml
 │
 ├── Jenkinsfile
 │
 └── README.md
-
+```
 
 ---
 
 # Deployment Process
 
-## 1. Infrastructure Provisioning
+## Step 1: Provision Infrastructure
 
-Terraform was used to create AWS infrastructure.
+Terraform is used to create the required AWS resources.
 
 Commands:
 
@@ -171,111 +228,163 @@ terraform init
 terraform plan
 
 terraform apply
+```
 
-Terraform provisions the required AWS resources for deployment.
+---
 
-2. Server Configuration
+## Step 2: Configure Server Using Ansible
 
-Ansible was used to configure the EC2 environment.
+Run the Ansible playbook:
 
-Tasks include:
+```bash
+ansible-playbook \
+-i ansible/inventory \
+ansible/playbook.yml \
+--private-key ~/cohort-7-keypair.pem
+```
 
-Installing required packages
-Preparing the server
-Configuring application requirements
-3. Application Containerization
+This prepares the EC2 environment for deployment.
 
-Docker images were created for both applications.
+---
 
-Portfolio Application
+## Step 3: Build Applications
 
-Build:
+### Java Application
 
-docker build -t portfolio ./portfolio
-Java Application
+Navigate to the Java application:
 
-First build the Spring Boot application:
-
+```bash
 cd java-app
+```
 
+Build the Spring Boot application:
+
+```bash
 ./mvnw clean package
+```
 
-Build Docker image:
+---
 
-docker build -t java-app .
-4. Running Applications with Docker Compose
+## Step 4: Build Docker Images
 
-The applications are deployed together using:
+Portfolio:
 
+```bash
+docker build -t portfolio ./portfolio
+```
+
+Java Application:
+
+```bash
+docker build -t java-app ./java-app
+```
+
+---
+
+## Step 5: Deploy Using Docker Compose
+
+Start all services:
+
+```bash
 docker compose up -d
+```
 
 Check running containers:
 
+```bash
 docker ps
+```
 
-Example output:
+Expected containers:
 
-portfolio     Up
-java-app      Up
-CI/CD Pipeline
+```
+portfolio
+java-app
+```
 
-GitHub Actions workflow location:
+---
 
-.github/workflows/deploy.yml
+# CI Pipeline Workflow
 
-Pipeline workflow:
+The GitHub Actions pipeline follows this process:
 
-Git Push
-    |
-    v
+```
+Developer Push
+       |
+       v
 GitHub Actions Triggered
-    |
-    v
+       |
+       v
 Checkout Repository
-    |
-    v
+       |
+       v
 Build Java Application
-    |
-    v
+       |
+       v
 Build Docker Images
-    |
-    v
+       |
+       v
 Pipeline Successful
-Running Applications
-Portfolio Website
+```
 
-URL:
+---
 
+# Application URLs
+
+## Portfolio Website
+
+```
 http://44.222.97.125
-Java Spring Boot Application
+```
 
-URL:
+## Java Spring Boot Application
 
+```
 http://44.222.97.125:8080
-Verification
+```
 
-The deployment was verified by:
+---
 
-Checking running containers
+# Verification
+
+The deployment was verified using:
+
+## Check Docker Containers
+
+```bash
 docker ps
-Testing Portfolio Application
+```
+
+## Test Portfolio Application
+
+```bash
 curl http://localhost
-Testing Java Application
+```
+
+## Test Java Application
+
+```bash
 curl http://localhost:8080
-Project Achievements
+```
 
-This project demonstrates practical implementation of:
+---
 
-✅ Infrastructure as Code using Terraform
-✅ Configuration Management using Ansible
-✅ Docker containerization
-✅ Multi-container deployment using Docker Compose
-✅ Cloud deployment on AWS EC2
-✅ CI automation using GitHub Actions
-✅ Version control using Git and GitHub
+# Project Achievements
 
-Author
+This project successfully demonstrates:
 
-Martins Airende
+✅ Cloud deployment using AWS EC2  
+✅ Infrastructure as Code using Terraform  
+✅ Configuration Management using Ansible  
+✅ Docker containerization  
+✅ Multi-container deployment using Docker Compose  
+✅ CI automation using GitHub Actions  
+✅ Source control using Git and GitHub  
+
+---
+
+# Author
+
+**Martins Airende**
 
 DevOps Final Project
